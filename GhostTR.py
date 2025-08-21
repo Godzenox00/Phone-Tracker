@@ -151,11 +151,24 @@ def TrackLu():
         ]
         for site in social_media:
             url = site['url'].format(username)
-            response = requests.get(url)
-            if response.status_code == 200:
-                results[site['name']] = url
-            else:
-                results[site['name']] = (f"{Ye}Username not found {Ye}!")
+            try:
+                response = requests.get(url, timeout=10)  # always set a timeout
+                if response.status_code == 200:
+                    results[site['name']] = url
+                else:
+                    results[site['name']] = (f"{Ye}Username not found {Ye}!")
+
+            except requests.exceptions.ConnectTimeout:
+                results[site['name']] = (f"{Re}Connection timed out while trying to connect to {site['name']}{Re}!")
+
+            except requests.exceptions.ReadTimeout:
+                results[site['name']] = (f"{Re}Server took too long to respond on {site['name']}{Re}!")
+
+            except requests.exceptions.ConnectionError:
+                results[site['name']] = (f"{Re}Connection Error{Re}! Can't access {site['name']}. Maybe banned in your country.")
+
+            except requests.exceptions.RequestException as e:
+                results[site['name']] = (f"{Re}Request failed for {site['name']}: {e}{Re}!")
     except Exception as e:
         print(f"{Re}Error : {e}")
         return
