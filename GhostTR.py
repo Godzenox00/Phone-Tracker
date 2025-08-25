@@ -125,7 +125,7 @@ def TrackLu():
         results = {}
         social_media = [
             {"url": "https://www.facebook.com/{}", "name": "Facebook"},
-            {"url": "https://www.twitter.com/{}", "name": "Twitter"},
+            {"url": "https://www.x.com/{}", "name": "X"},
             {"url": "https://www.instagram.com/{}", "name": "Instagram"},
             {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
             {"url": "https://www.github.com/{}", "name": "GitHub"},
