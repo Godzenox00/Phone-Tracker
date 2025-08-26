@@ -6,6 +6,7 @@
 
 # IMPORT MODULE
 
+import asyncio
 import json
 import requests
 import time
@@ -23,6 +24,32 @@ Mage = '\033[1;35m'
 Cy = '\033[1;36m'
 Wh = '\033[1;37m'
 
+social_media = [
+    {"url": "https://www.facebook.com/{}", "name": "Facebook"},
+    {"url": "https://www.x.com/{}", "name": "X"},
+    {"url": "https://www.instagram.com/{}", "name": "Instagram"},
+    {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
+    {"url": "https://www.github.com/{}", "name": "GitHub"},
+    {"url": "https://www.pinterest.com/{}", "name": "Pinterest"},
+    {"url": "https://www.tumblr.com/{}", "name": "Tumblr"},
+    {"url": "https://www.youtube.com/{}", "name": "Youtube"},
+    {"url": "https://soundcloud.com/{}", "name": "SoundCloud"},
+    {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
+    {"url": "https://www.tiktok.com/@{}", "name": "TikTok"},
+    {"url": "https://www.behance.net/{}", "name": "Behance"},
+    {"url": "https://www.medium.com/@{}", "name": "Medium"},
+    {"url": "https://www.quora.com/profile/{}", "name": "Quora"},
+    {"url": "https://www.flickr.com/people/{}", "name": "Flickr"},
+    {"url": "https://www.periscope.tv/{}", "name": "Periscope"},
+    {"url": "https://www.twitch.tv/{}", "name": "Twitch"},
+    {"url": "https://www.dribbble.com/{}", "name": "Dribbble"},
+    {"url": "https://www.stumbleupon.com/stumbler/{}", "name": "StumbleUpon"},
+    {"url": "https://www.ello.co/{}", "name": "Ello"},
+    {"url": "https://www.producthunt.com/@{}", "name": "Product Hunt"},
+    {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
+    {"url": "https://www.telegram.me/{}", "name": "Telegram"},
+    {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
+]
 
 # utilities
 
@@ -118,40 +145,29 @@ def phoneGW():
         print(f" {Wh}Type                 :{Gr} This is another type of number")
 
 
+# Multi Thread requests to following social media
+async def getUsernameData(format_string: str, username: str):
+    url = format_string.format(username)
+    return await asyncio.to_thread(requests.get, url)
+
+async def getResponses(username: str):    
+    tasks = []
+        
+    for site in social_media:
+        tasks.append(getUsernameData(site['url'], username))
+            
+    return await asyncio.gather(*tasks)
+
 @is_option
 def TrackLu():
     try:
         username = input(f"\n {Wh}Enter Username : {Gr}")
+        task_results = asyncio.run(getResponses(username))
         results = {}
-        social_media = [
-            {"url": "https://www.facebook.com/{}", "name": "Facebook"},
-            {"url": "https://www.twitter.com/{}", "name": "Twitter"},
-            {"url": "https://www.instagram.com/{}", "name": "Instagram"},
-            {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
-            {"url": "https://www.github.com/{}", "name": "GitHub"},
-            {"url": "https://www.pinterest.com/{}", "name": "Pinterest"},
-            {"url": "https://www.tumblr.com/{}", "name": "Tumblr"},
-            {"url": "https://www.youtube.com/{}", "name": "Youtube"},
-            {"url": "https://soundcloud.com/{}", "name": "SoundCloud"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.tiktok.com/@{}", "name": "TikTok"},
-            {"url": "https://www.behance.net/{}", "name": "Behance"},
-            {"url": "https://www.medium.com/@{}", "name": "Medium"},
-            {"url": "https://www.quora.com/profile/{}", "name": "Quora"},
-            {"url": "https://www.flickr.com/people/{}", "name": "Flickr"},
-            {"url": "https://www.periscope.tv/{}", "name": "Periscope"},
-            {"url": "https://www.twitch.tv/{}", "name": "Twitch"},
-            {"url": "https://www.dribbble.com/{}", "name": "Dribbble"},
-            {"url": "https://www.stumbleupon.com/stumbler/{}", "name": "StumbleUpon"},
-            {"url": "https://www.ello.co/{}", "name": "Ello"},
-            {"url": "https://www.producthunt.com/@{}", "name": "Product Hunt"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.telegram.me/{}", "name": "Telegram"},
-            {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
-        ]
+
         for site in social_media:
             url = site['url'].format(username)
-            response = requests.get(url)
+            response = task_results.pop(0)
             if response.status_code == 200:
                 results[site['name']] = url
             else:
