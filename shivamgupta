@@ -1,0 +1,4 @@
+rm-rf voting 
+git clone https://github.com/shivamgupta/rvoting
+cd rvoting
+python run. py
