@@ -235,7 +235,7 @@ def execute_option(opt):
     except ValueError as e:
         print(e)
         time.sleep(2)
-        execute_option(opt)
+        main()
     except KeyboardInterrupt:
         print(f'\n{Wh}[ {Re}! {Wh}] {Re}Exit')
         time.sleep(2)
