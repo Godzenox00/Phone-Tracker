@@ -1,102 +1,88 @@
-# phone-tracker
+# Phone Locator
 
-# Phone tracker
-
-[![Test and Validate](https://github.com/jmeiracorbal/phone-tracker/workflows/Test%20and%20Validate/badge.svg)](https://github.com/jmeiracorbal/phone-tracker/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
-[![Poetry](https://img.shields.io/badge/Poetry-1.0%2B-orange.svg)](https://python-poetry.org)
+[![uv](https://img.shields.io/badge/uv-managed-blue.svg)](https://github.com/astral-sh/uv)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)](https://github.com/jmeiracorbal/phone-tracker)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)](https://github.com/jmeiracorbal/phone-locator)
 
-A tool to get detailed information about phone numbers. It helps you discover location, carrier, timezone, and other details about any phone number you're curious about.
+A command-line tool to get detailed information about phone numbers. Discover location, carrier, timezone, and other details about any phone number.
 
-## What it does
+## Features
 
 - **Phone number analysis** - Get complete information about any phone number
 - **Country and region detection** - Country, region, city, and coordinates
 - **Carrier details** - Mobile operator and service provider info
 - **Timezone identification** - Automatically finds the right timezone
-- **Number validation** - Check if the number is valid and possible
-- **Nice interface** - Clean, colored output that's easy to read
+- **Number validation** - Check if phone numbers are valid and possible
+- **Format conversion** - International, national, E.164 formats
+- **Clean interface** - Colored terminal output
 
-## Download executable
+## Installation
 
-1. **Go to [Releases](https://github.com/jmeiracorbal/phone-tracker/releases)**
-2. **Download the executable for your platform:**
-   - **Linux**: `phone-tracker` (binary)
-   - **macOS**: `phone-tracker` (binary)
-   - **Windows**: `phone-tracker.exe` (executable)
-3. **Run directly** - No installation required!
+### Option 1: Install as command-line tool
 
-### Usage
+Install directly from the repository:
+
+```bash
+pip install git+https://github.com/jmeiracorbal/phone-locator.git
+```
+
+Or clone and install locally:
+
+```bash
+git clone https://github.com/jmeiracorbal/phone-locator.git
+cd phone-locator
+pip install .
+```
+
+After installation, run from anywhere:
+
+```bash
+phone-locator
+```
+
+### Option 2: Download pre-built executable
+
+1. Go to [Releases](https://github.com/jmeiracorbal/phone-locator/releases)
+2. Download the executable for your platform:
+   - **Linux**: `phone-locator` (binary)
+   - **macOS**: `phone-locator` (binary)
+   - **Windows**: `phone-locator.exe` (executable)
+3. Run directly without installation
 
 **Linux/macOS:**
 
 ```bash
-chmod +x phone-tracker
-```
-
-```bash
-./phone-tracker
+chmod +x phone-locator
+./phone-locator
 ```
 
 **Windows:**
 
 ```cmd
-phone-tracker.exe
+phone-locator.exe
 ```
 
-_Output example_:
-
-```
-Enter phone number information:
-Country Code Ex [34, 1, 81] : 34
-Phone Number Ex [666666666] : xxxxxxxxx
-
-========== SHOW INFORMATION PHONE NUMBERS ==========
-
-Full Number         : +34xxxxxxxxx
-Location             : Spanyol
-Region Code          : ES
-Timezone             : Atlantic/Canary, Europe/Madrid
-Operator             : Orange
-Valid number         : True
-Possible number      : True
-International format : +34 xxx xx xx xx
-Mobile format        : +34 xxx xx xx xx
-Type                 : This is a mobile number
-```
-
-## How it works
-
-The tool uses the `phonenumbers` library to:
-
-1. Parse and validate phone numbers
-2. Extract country and region information
-3. Determine carrier and operator details
-4. Identify timezone information
-5. Format numbers in various international standards
-
-## Supported formats
-
-- **Country codes**: +1 (US/Canada), +34 (Spain), +81 (Japan), +86 (China), etc.
-- **Number types**: Mobile, Fixed-line, Toll-free, Premium rate
-- **International standards**: E.164, International, National formats
-
-## For Developers
-
-### Run from source
-If you want to run the source code:
+### Option 3: Run with uv (for development)
 
 ```bash
-git clone https://github.com/jmeiracorbal/phone-tracker.git
-cd phone-tracker
-pip install phonenumbers requests
-python phone_tracker.py
+git clone https://github.com/jmeiracorbal/phone-locator.git
+cd phone-locator
+uv run python main.py
 ```
 
-### Build executables
-Executables are automatically built and released via GitHub Actions when tags are pushed.
+## Usage
+
+After installation or running the executable, enter a country code and phone number to get detailed information including location, carrier, timezone, and validity.
+
+## Requirements
+
+- Python 3.8 or higher
+- Internet connection (for carrier lookup)
+
+## Data Source
+
+This tool uses the `phonenumbers` library by Google to parse and validate phone numbers with comprehensive metadata.
 
 ## Contributing
 
@@ -113,14 +99,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - **Original author**: [HUNXBYTS](https://github.com/HUNXBYTS)
-- **Forked from**: [jmeiracorbal](https://github.com/jmeiracorbal)
+- **Modified by**: [jmeiracorbal](https://github.com/jmeiracorbal)
 - **Based on**: Ghost Tracker tool
 
 ## Support
 
 If you run into any issues or have questions:
 - Create an issue on GitHub
-- Check the [Releases](https://github.com/jmeiracorbal/phone-tracker/releases) page for the latest version
+- Check the [Releases](https://github.com/jmeiracorbal/phone-locator/releases) page for the latest version
 
 ---
 
