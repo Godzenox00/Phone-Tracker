@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: https:;">
+  <title>GhostTrack v3.0</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Custom Title Bar -->
+  <div class="titlebar" id="titlebar">
+    <div class="titlebar-drag">
+      <span class="titlebar-icon">&#128123;</span>
+      <span class="titlebar-text">GhostTrack v3.0</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="tb-btn tb-minimize" id="btn-minimize">&#x2015;</button>
+      <button class="tb-btn tb-maximize" id="btn-maximize">&#9634;</button>
+      <button class="tb-btn tb-close" id="btn-close">&#10005;</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <pre class="ghost-ascii">
+   .-.
+ .'   '.
+ :g g   :
+ : o    '.
+:         ''.
+:            '.
+ '.. :       '.;
+    ':;        :'
+       :        '.
+        '.       '.
+        </pre>
+        <div class="sidebar-brand">GHOST<span class="accent">TRACK</span></div>
+        <div class="sidebar-version">OSINT Toolkit v3.0</div>
+      </div>
+
+      <div class="nav-items">
+        <button class="nav-btn active" data-page="ip-tracker">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>IP Tracker</span>
+        </button>
+        <button class="nav-btn" data-page="my-ip">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span>My IP</span>
+        </button>
+        <button class="nav-btn" data-page="phone-tracker">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Phone Tracker</span>
+        </button>
+        <button class="nav-btn" data-page="username-tracker">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Username Tracker</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="footer-text">Code by <span class="accent">HunxByts</span></div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content">
+
+      <!-- IP Tracker Page -->
+      <div class="page active" id="page-ip-tracker">
+        <div class="page-header">
+          <h1>IP Address Tracker</h1>
+          <p class="page-desc">Geolocate any IP address with detailed network information</p>
+        </div>
+        <div class="input-group">
+          <input type="text" id="ip-input" class="ghost-input" placeholder="Enter IP address (e.g., 8.8.8.8)" spellcheck="false" autocomplete="off">
+          <button class="ghost-btn" id="ip-track-btn">
+            <span class="btn-text">Track</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </div>
+        <div id="ip-results" class="results-area"></div>
+      </div>
+
+      <!-- My IP Page -->
+      <div class="page" id="page-my-ip">
+        <div class="page-header">
+          <h1>My IP Address</h1>
+          <p class="page-desc">Discover your public IP address and location details</p>
+        </div>
+        <div class="input-group">
+          <button class="ghost-btn wide" id="myip-btn">
+            <span class="btn-text">Reveal My IP</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </div>
+        <div id="myip-results" class="results-area"></div>
+      </div>
+
+      <!-- Phone Tracker Page -->
+      <div class="page" id="page-phone-tracker">
+        <div class="page-header">
+          <h1>Phone Number Tracker</h1>
+          <p class="page-desc">Analyze phone numbers for carrier, location, and format details</p>
+        </div>
+        <div class="input-group">
+          <input type="text" id="phone-input" class="ghost-input" placeholder="Enter phone number (e.g., +14155552671)" spellcheck="false" autocomplete="off">
+          <select id="phone-region" class="ghost-select">
+            <option value="US">US</option>
+            <option value="GB">UK</option>
+            <option value="ID">ID</option>
+            <option value="IN">IN</option>
+            <option value="DE">DE</option>
+            <option value="FR">FR</option>
+            <option value="JP">JP</option>
+            <option value="BR">BR</option>
+            <option value="AU">AU</option>
+            <option value="CA">CA</option>
+          </select>
+          <button class="ghost-btn" id="phone-track-btn">
+            <span class="btn-text">Analyze</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </div>
+        <div id="phone-results" class="results-area"></div>
+      </div>
+
+      <!-- Username Tracker Page -->
+      <div class="page" id="page-username-tracker">
+        <div class="page-header">
+          <h1>Username Tracker</h1>
+          <p class="page-desc">Search for a username across 35+ social media platforms</p>
+        </div>
+        <div class="input-group">
+          <input type="text" id="username-input" class="ghost-input" placeholder="Enter username to search" spellcheck="false" autocomplete="off">
+          <button class="ghost-btn" id="username-track-btn">
+            <span class="btn-text">Search</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </div>
+        <div id="username-results" class="results-area"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
