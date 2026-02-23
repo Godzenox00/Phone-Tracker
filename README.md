@@ -1,51 +1,106 @@
 # GhostTrack
-Useful tool to track location or mobile number, so this tool can be called osint or also information gathering
+
+OSINT & Information Gathering tool with a modern Electron desktop GUI.
 
 <img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/bn.png"/>
 
-New update :
-```Version 2.2```
+## Version 3.0 - Electron GUI Edition
 
-### Instalation on Linux (deb)
-```
-sudo apt-get install git
-sudo apt-get install python3
-```
+### What's New
 
-### Instalation on Termux
-```
-pkg install git
-pkg install python3
-```
+- **Modern Desktop GUI** - Dark-themed Electron interface with sidebar navigation
+- **Better IP Tracking** - Dual API fallback (ip-api.com + ipwho.is), proxy/VPN detection, hosting detection
+- **Improved Phone Analysis** - Google's libphonenumber (same library used by Android), more formats and validation
+- **Expanded Username Search** - 35+ platforms searched concurrently (was 23), with filtering and status indicators
+- **My IP Auto-Analysis** - Reveals your IP and automatically shows full geolocation details
+- **Portable EXE** - One-click build script to create a standalone Windows executable
+- **Custom Window** - Frameless dark window with custom controls
 
-### Usage Tool
-```
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| IP Tracker | Geolocate any IP with country, city, ISP, proxy/VPN detection, and Google Maps link |
+| My IP | Discover your public IP with auto-geolocation |
+| Phone Tracker | Analyze phone numbers - carrier, type, country, multiple format outputs |
+| Username Tracker | Search 35+ social platforms concurrently with found/not-found filtering |
+
+## Installation & Usage
+
+### Electron GUI (Recommended)
+
+**Prerequisites:** [Node.js 18+](https://nodejs.org)
+
+```bash
 git clone https://github.com/HunxByts/GhostTrack.git
-cd GhostTrack
+cd GhostTrack/electron-app
+npm install
+npm start
+```
+
+### Build Portable EXE (Windows)
+
+Double-click `build-exe.bat` in the project root, or run:
+
+```bash
+cd electron-app
+npm install
+npm run build
+```
+
+The portable `.exe` will be in the `dist/` folder.
+
+### Legacy CLI (Python)
+
+The original Python CLI is still available:
+
+```bash
 pip3 install -r requirements.txt
 python3 GhostTR.py
 ```
 
-Display on the menu ```IP Tracker```
+## Tech Stack
 
-<img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/ip.png " />
+| Component | Technology |
+|-----------|-----------|
+| Desktop Framework | Electron 33 |
+| IP Geolocation | ip-api.com (primary) + ipwho.is (fallback) |
+| Phone Parsing | libphonenumber-js (Google's library) |
+| HTTP Client | Axios |
+| Build Tool | electron-builder |
+| UI | Custom HTML/CSS dark theme |
 
-on the IP Track menu, you can combo with the seeker tool to get the target IP
-<details>
-<summary>:zap: Install Seeker :</summary>
-- <strong><a href="https://github.com/thewhiteh4t/seeker">Get Seeker</a></strong>
-</details>
+### Installation on Linux (deb)
+```
+sudo apt-get install git nodejs npm
+```
 
-Display on the menu ```Phone Tracker```
+### Installation on Termux
+```
+pkg install git nodejs
+```
 
-<img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/phone.png" />
+## Project Structure
 
-on this menu you can search for information from the target phone number
-
-Display on the menu ```Username Tracker```
-
-<img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/User.png"/>
-on this menu you can search for information from the target username on social media
+```
+GhostTrack/
+├── electron-app/          # Electron desktop application
+│   ├── main.js            # Main process (window, IPC handlers)
+│   ├── preload.js         # Secure bridge between main & renderer
+│   ├── package.json       # Dependencies & build config
+│   ├── src/               # Backend modules
+│   │   ├── ip-tracker.js      # IP geolocation (dual API)
+│   │   ├── phone-tracker.js   # Phone number analysis
+│   │   └── username-tracker.js # Username OSINT (35+ platforms)
+│   └── renderer/          # Frontend
+│       ├── index.html     # GUI layout
+│       ├── styles.css     # Dark theme styles
+│       └── renderer.js    # UI logic & event handling
+├── GhostTR.py             # Legacy Python CLI
+├── build-exe.bat          # Windows EXE build script
+├── requirements.txt       # Python dependencies (legacy)
+└── asset/                 # Images & branding
+```
 
 <details>
 <summary>:zap: Author :</summary>
