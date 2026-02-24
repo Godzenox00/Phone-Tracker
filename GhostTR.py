@@ -14,6 +14,9 @@ import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
 
+# network resilience helper
+from requests.exceptions import ConnectionError, Timeout, RequestException
+
 Bl = '\033[30m'  # VARIABLE BUAT WARNA CUYY
 Re = '\033[1;31m'
 Gr = '\033[1;32m'
@@ -42,7 +45,10 @@ def IP_Track():
     ip = input(f"{Wh}\n Enter IP target : {Gr}")  # INPUT IP ADDRESS
     print()
     print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
-    req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
+    req_api = get_data(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
+    if not req_api:
+        # error already printed by helper
+        return
     ip_data = json.loads(req_api.text)
     time.sleep(2)
     print(f"{Wh}\n IP target       :{Gr}", ip)
@@ -151,8 +157,8 @@ def TrackLu():
         ]
         for site in social_media:
             url = site['url'].format(username)
-            response = requests.get(url)
-            if response.status_code == 200:
+            response = get_data(url)
+            if response and response.status_code == 200:
                 results[site['name']] = url
             else:
                 results[site['name']] = (f"{Ye}Username not found {Ye}!")
@@ -168,8 +174,11 @@ def TrackLu():
 
 @is_option
 def showIP():
-    respone = requests.get('https://api.ipify.org/')
-    Show_IP = respone.text
+    respone = get_data('https://api.ipify.org/')
+    if respone:
+        Show_IP = respone.text
+    else:
+        Show_IP = "N/A"
 
     print(f"\n {Wh}========== {Gr}SHOW INFORMATION YOUR IP {Wh}==========")
     print(f"\n {Wh}[{Gr} + {Wh}] Your IP Adrress : {Gr}{Show_IP}")
@@ -231,11 +240,9 @@ def execute_option(opt):
     try:
         call_option(opt)
         input(f'\n{Wh}[ {Gr}+ {Wh}] {Gr}Press enter to continue')
-        main()
     except ValueError as e:
         print(e)
         time.sleep(2)
-        execute_option(opt)
     except KeyboardInterrupt:
         print(f'\n{Wh}[ {Re}! {Wh}] {Re}Exit')
         time.sleep(2)
@@ -293,17 +300,45 @@ def run_banner():
     time.sleep(0.5)
 
 
-def main():
-    clear()
-    option()
-    time.sleep(1)
+
+# resilient network request helper
+
+def get_data(url, timeout=10):
+    """Perform a GET request with basic error handling and return the response object.
+    Returns None if an error occurred."""
     try:
-        opt = int(input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}"))
-        execute_option(opt)
-    except ValueError:
-        print(f'\n{Wh}[ {Re}! {Wh}] {Re}Please input number')
-        time.sleep(2)
-        main()
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        return response
+    except ConnectionError:
+        print("\n[!] Error: Check your internet connection.")
+    except Timeout:
+        print("\n[!] Error: The server took too long to respond. Try again later.")
+    except RequestException as e:
+        print(f"\n[!] An unexpected error occurred: {e}")
+    return None
+
+
+def main():
+    # loop rather than recursive calls to avoid infinite-loop issues
+    while True:
+        clear()
+        option()
+        time.sleep(1)
+        choice = input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}")
+        if choice == "1":
+            execute_option(1)
+        elif choice == "2":
+            execute_option(2)
+        elif choice == "3":
+            execute_option(3)
+        elif choice == "4":
+            execute_option(4)
+        elif choice == "0":
+            exit()
+        else:
+            print("\n[!] Invalid Option. Please select a number from the menu.")
+            time.sleep(2)
 
 
 if __name__ == '__main__':
