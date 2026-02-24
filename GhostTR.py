@@ -9,7 +9,10 @@
 import json
 import requests
 import time
+import socket
+import ipaddress
 import os
+import ipaddress
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
@@ -35,47 +38,89 @@ def is_option(func):
 
     return wrapper
 
+# FUCTIONS FOR IP
+def is_private_ip(ip):
+    """Check if IP is private/internal"""
+    try:
+        return ipaddress.ip_address(ip).is_private
+    except ValueError:
+        return False
+    
+def get_hostname(ip): 
+    """Get hostname from IP address"""
+    try:
+        return socket.gethostbyaddr(ip)[0]
+    except (socket.herror, socket.gaierror):
+        try:
+            result = os.popen(f"nslookup {ip} 2>/dev/null | grep 'name ='").read()
+            if result:
+                return result.split("=")[1].strip()
+        except:
+            pass
+        return "Unable to retrieve"
+    
+def get_mac_address(ip):
+    """Get MAC address from IP (Linux/Mac only)"""
+    try:
+        result = os.popen(f"arp -n {ip} | grep {ip}").read()
+        if result:
+            return result.split()[2]
+    except:
+        pass
+    return "Unable to retrieve"
+       
+
 
 # FUNCTIONS FOR MENU
 @is_option
 def IP_Track():
     ip = input(f"{Wh}\n Enter IP target : {Gr}")  # INPUT IP ADDRESS
     print()
-    print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
-    req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
-    ip_data = json.loads(req_api.text)
-    time.sleep(2)
-    print(f"{Wh}\n IP target       :{Gr}", ip)
-    print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
-    print(f"{Wh} Country         :{Gr}", ip_data["country"])
-    print(f"{Wh} Country Code    :{Gr}", ip_data["country_code"])
-    print(f"{Wh} City            :{Gr}", ip_data["city"])
-    print(f"{Wh} Continent       :{Gr}", ip_data["continent"])
-    print(f"{Wh} Continent Code  :{Gr}", ip_data["continent_code"])
-    print(f"{Wh} Region          :{Gr}", ip_data["region"])
-    print(f"{Wh} Region Code     :{Gr}", ip_data["region_code"])
-    print(f"{Wh} Latitude        :{Gr}", ip_data["latitude"])
-    print(f"{Wh} Longitude       :{Gr}", ip_data["longitude"])
-    lat = int(ip_data['latitude'])
-    lon = int(ip_data['longitude'])
-    print(f"{Wh} Maps            :{Gr}", f"https://www.google.com/maps/@{lat},{lon},8z")
-    print(f"{Wh} EU              :{Gr}", ip_data["is_eu"])
-    print(f"{Wh} Postal          :{Gr}", ip_data["postal"])
-    print(f"{Wh} Calling Code    :{Gr}", ip_data["calling_code"])
-    print(f"{Wh} Capital         :{Gr}", ip_data["capital"])
-    print(f"{Wh} Borders         :{Gr}", ip_data["borders"])
-    print(f"{Wh} Country Flag    :{Gr}", ip_data["flag"]["emoji"])
-    print(f"{Wh} ASN             :{Gr}", ip_data["connection"]["asn"])
-    print(f"{Wh} ORG             :{Gr}", ip_data["connection"]["org"])
-    print(f"{Wh} ISP             :{Gr}", ip_data["connection"]["isp"])
-    print(f"{Wh} Domain          :{Gr}", ip_data["connection"]["domain"])
-    print(f"{Wh} ID              :{Gr}", ip_data["timezone"]["id"])
-    print(f"{Wh} ABBR            :{Gr}", ip_data["timezone"]["abbr"])
-    print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
-    print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
-    print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
 
+    # Check if IP is internal
+    if is_private_ip(ip):
+        print(f'{Wh} ============ {Gr} SHOW INFORMATION INTERNAL IP {Wh} =============')
+        print(f"{Wh}\n IP target      :{Gr}", ip)
+        print(f"{Wh}  Type          :{Gr} Internal IP") 
+        print(f"{Wh}  Hostname      :{Gr}", get_hostname(ip))
+        print(f"{Wh}  MAC address   :{Gr}", get_mac_address(ip))
+        print(f"{Wh}  Status        :{Gr}", "Reachable (Local Network)" if 
+              os.system(f"ping -c 1 {ip} > /dev/null 2>&1") == 0 else "Unreachable")
+    else:
+        print(f' {Wh} ============ {Gr} SHOW INFORMATION IP ADDRESS {Wh} ==============')
+        req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
+        ip_data = json.loads(req_api.text)
+        time.sleep(2)
+        print(f"{Wh}\n IP target       :{Gr}", ip)
+        print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
+        print(f"{Wh} Country         :{Gr}", ip_data["country"])
+        print(f"{Wh} Country Code    :{Gr}", ip_data["country_code"])
+        print(f"{Wh} City            :{Gr}", ip_data["city"])
+        print(f"{Wh} Continent       :{Gr}", ip_data["continent"])
+        print(f"{Wh} Continent Code  :{Gr}", ip_data["continent_code"])
+        print(f"{Wh} Region          :{Gr}", ip_data["region"])
+        print(f"{Wh} Region Code     :{Gr}", ip_data["region_code"])
+        print(f"{Wh} Latitude        :{Gr}", ip_data["latitude"])
+        print(f"{Wh} Longitude       :{Gr}", ip_data["longitude"])
+        lat = int(ip_data['latitude'])
+        lon = int(ip_data['longitude'])
+        print(f"{Wh} Maps            :{Gr}", f"https://www.google.com/maps/@{lat},{lon},8z")
+        print(f"{Wh} EU              :{Gr}", ip_data["is_eu"])
+        print(f"{Wh} Postal          :{Gr}", ip_data["postal"])
+        print(f"{Wh} Calling Code    :{Gr}", ip_data["calling_code"])
+        print(f"{Wh} Capital         :{Gr}", ip_data["capital"])
+        print(f"{Wh} Borders         :{Gr}", ip_data["borders"])
+        print(f"{Wh} Country Flag    :{Gr}", ip_data["flag"]["emoji"])
+        print(f"{Wh} ASN             :{Gr}", ip_data["connection"]["asn"])
+        print(f"{Wh} ORG             :{Gr}", ip_data["connection"]["org"])
+        print(f"{Wh} ISP             :{Gr}", ip_data["connection"]["isp"])
+        print(f"{Wh} Domain          :{Gr}", ip_data["connection"]["domain"])
+        print(f"{Wh} ID              :{Gr}", ip_data["timezone"]["id"])
+        print(f"{Wh} ABBR            :{Gr}", ip_data["timezone"]["abbr"])
+        print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
+        print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
+        print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
+        print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"].get("current_time", "N/A"))    
 
 @is_option
 def phoneGW():
