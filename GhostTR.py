@@ -13,6 +13,7 @@ import os
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 Bl = '\033[30m'  # VARIABLE BUAT WARNA CUYY
 Re = '\033[1;31m'
@@ -22,6 +23,18 @@ Blu = '\033[1;34m'
 Mage = '\033[1;35m'
 Cy = '\033[1;36m'
 Wh = '\033[1;37m'
+
+
+# HTTP Configuration
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                  '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+}
+
+REQUEST_TIMEOUT = 10  # seconds
+MAX_WORKERS = 20      # concurrent threads
 
 
 # utilities
@@ -42,8 +55,11 @@ def IP_Track():
     ip = input(f"{Wh}\n Enter IP target : {Gr}")  # INPUT IP ADDRESS
     print()
     print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
-    req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
+    req_api = requests.get(f"http://ipwho.is/{ip}", headers=HEADERS, timeout=REQUEST_TIMEOUT)
     ip_data = json.loads(req_api.text)
+    if not ip_data.get('success', True):
+        print(f"\n {Re}Error: {ip_data.get('message', 'Invalid IP address')}")
+        return
     time.sleep(2)
     print(f"{Wh}\n IP target       :{Gr}", ip)
     print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
@@ -56,8 +72,8 @@ def IP_Track():
     print(f"{Wh} Region Code     :{Gr}", ip_data["region_code"])
     print(f"{Wh} Latitude        :{Gr}", ip_data["latitude"])
     print(f"{Wh} Longitude       :{Gr}", ip_data["longitude"])
-    lat = int(ip_data['latitude'])
-    lon = int(ip_data['longitude'])
+    lat = ip_data['latitude']
+    lon = ip_data['longitude']
     print(f"{Wh} Maps            :{Gr}", f"https://www.google.com/maps/@{lat},{lon},8z")
     print(f"{Wh} EU              :{Gr}", ip_data["is_eu"])
     print(f"{Wh} Postal          :{Gr}", ip_data["postal"])
@@ -118,57 +134,160 @@ def phoneGW():
         print(f" {Wh}Type                 :{Gr} This is another type of number")
 
 
+# Social media sites list — each entry can have:
+#   url        : profile URL template (use {} for username)
+#   name       : display name
+#   err_code   : HTTP code that means "not found" (default 404)
+#   err_text   : if the site returns 200 for missing users, a string to look for in the body
+SOCIAL_MEDIA = [
+    # --- Major platforms ---
+    {"url": "https://www.facebook.com/{}",              "name": "Facebook"},
+    {"url": "https://www.instagram.com/{}",             "name": "Instagram"},
+    {"url": "https://x.com/{}",                         "name": "X (Twitter)"},
+    {"url": "https://www.tiktok.com/@{}",               "name": "TikTok"},
+    {"url": "https://www.youtube.com/@{}",              "name": "YouTube"},
+    {"url": "https://www.linkedin.com/in/{}",           "name": "LinkedIn"},
+    {"url": "https://www.snapchat.com/add/{}",          "name": "Snapchat"},
+    {"url": "https://www.threads.net/@{}",              "name": "Threads"},
+
+    # --- Dating (popular in Brazil) ---
+    {"url": "https://tinder.com/@{}",                   "name": "Tinder"},
+    {"url": "https://badoo.com/profile/{}",             "name": "Badoo"},
+    {"url": "https://www.happn.com/app/user/{}",        "name": "Happn"},
+    {"url": "https://bumble.com/profile/{}",            "name": "Bumble"},
+    {"url": "https://hinge.co/profile/{}",              "name": "Hinge"},
+    {"url": "https://www.okcupid.com/profile/{}",       "name": "OkCupid"},
+    {"url": "https://www.pof.com/viewprofile.aspx?profile_id={}", "name": "Plenty of Fish"},
+    {"url": "https://www.parperfeito.com.br/profile/{}", "name": "Par Perfeito"},
+    {"url": "https://www.inner.circle/profile/{}",      "name": "Inner Circle"},
+    {"url": "https://grindr.com/profile/{}",            "name": "Grindr"},
+    {"url": "https://hornet.com/@{}",                   "name": "Hornet"},
+
+    # --- Dev / Tech ---
+    {"url": "https://github.com/{}",                    "name": "GitHub"},
+    {"url": "https://gitlab.com/{}",                    "name": "GitLab"},
+    {"url": "https://bitbucket.org/{}",                 "name": "Bitbucket"},
+    {"url": "https://codepen.io/{}",                    "name": "CodePen"},
+    {"url": "https://replit.com/@{}",                   "name": "Replit"},
+    {"url": "https://stackoverflow.com/users/?tab=Accounts&SearchText={}", "name": "StackOverflow", "err_text": "page not found"},
+    {"url": "https://dev.to/{}",                        "name": "DEV.to"},
+    {"url": "https://hackernoon.com/@{}",               "name": "HackerNoon"},
+
+    # --- Creative ---
+    {"url": "https://www.behance.net/{}",               "name": "Behance"},
+    {"url": "https://dribbble.com/{}",                  "name": "Dribbble"},
+    {"url": "https://www.deviantart.com/{}",            "name": "DeviantArt"},
+    {"url": "https://www.flickr.com/people/{}",         "name": "Flickr"},
+    {"url": "https://unsplash.com/@{}",                 "name": "Unsplash"},
+    {"url": "https://500px.com/p/{}",                   "name": "500px"},
+
+    # --- Music / Video ---
+    {"url": "https://soundcloud.com/{}",                "name": "SoundCloud"},
+    {"url": "https://open.spotify.com/user/{}",         "name": "Spotify"},
+    {"url": "https://www.twitch.tv/{}",                 "name": "Twitch"},
+    {"url": "https://vimeo.com/{}",                     "name": "Vimeo"},
+    {"url": "https://www.dailymotion.com/{}",           "name": "Dailymotion"},
+
+    # --- Blogging / Writing ---
+    {"url": "https://medium.com/@{}",                   "name": "Medium"},
+    {"url": "https://www.tumblr.com/{}",                "name": "Tumblr"},
+    {"url": "https://substack.com/@{}",                 "name": "Substack"},
+    {"url": "https://{}.wordpress.com",                 "name": "WordPress"},
+    {"url": "https://{}.blogspot.com",                  "name": "Blogger"},
+
+    # --- Social / Community ---
+    {"url": "https://www.reddit.com/user/{}",           "name": "Reddit"},
+    {"url": "https://www.quora.com/profile/{}",         "name": "Quora"},
+    {"url": "https://www.pinterest.com/{}",             "name": "Pinterest"},
+    {"url": "https://mastodon.social/@{}",              "name": "Mastodon"},
+    {"url": "https://t.me/{}",                          "name": "Telegram"},
+    {"url": "https://www.weheartit.com/{}",             "name": "We Heart It"},
+    {"url": "https://ello.co/{}",                       "name": "Ello"},
+    {"url": "https://www.producthunt.com/@{}",          "name": "Product Hunt"},
+    {"url": "https://about.me/{}",                      "name": "About.me"},
+    {"url": "https://gravatar.com/{}",                  "name": "Gravatar"},
+    {"url": "https://keybase.io/{}",                    "name": "Keybase"},
+    {"url": "https://hub.docker.com/u/{}",              "name": "Docker Hub"},
+
+    # --- Gaming ---
+    {"url": "https://steamcommunity.com/id/{}",         "name": "Steam"},
+    {"url": "https://www.roblox.com/user.aspx?username={}", "name": "Roblox", "err_text": "Page cannot be found"},
+    {"url": "https://namemc.com/profile/{}",            "name": "NameMC (Minecraft)"},
+    {"url": "https://osu.ppy.sh/users/{}",              "name": "osu!"},
+
+    # --- Finance ---
+    {"url": "https://cash.app/${}",                     "name": "Cash App"},
+    {"url": "https://www.patreon.com/{}",               "name": "Patreon"},
+
+    # --- Misc ---
+    {"url": "https://www.thingiverse.com/{}",           "name": "Thingiverse"},
+    {"url": "https://www.instructables.com/member/{}",   "name": "Instructables"},
+    {"url": "https://tryhackme.com/p/{}",               "name": "TryHackMe"},
+    {"url": "https://www.fiverr.com/{}",                "name": "Fiverr"},
+    {"url": "https://linktr.ee/{}",                     "name": "Linktree"},
+]
+
+
+def _check_site(site, username, session):
+    """Check a single site for a username. Returns (name, url|None)."""
+    url = site['url'].format(username)
+    try:
+        resp = session.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT, allow_redirects=True)
+
+        # Some sites return 200 even for missing users; check body text
+        if 'err_text' in site:
+            if resp.status_code == 200 and site['err_text'].lower() not in resp.text.lower():
+                return (site['name'], url)
+            return (site['name'], None)
+
+        # Default: treat 200 as found
+        if resp.status_code == 200:
+            return (site['name'], url)
+
+        return (site['name'], None)
+    except requests.exceptions.RequestException:
+        return (site['name'], None)
+
+
 @is_option
 def TrackLu():
     try:
-        username = input(f"\n {Wh}Enter Username : {Gr}")
-        results = {}
-        social_media = [
-            {"url": "https://www.facebook.com/{}", "name": "Facebook"},
-            {"url": "https://www.twitter.com/{}", "name": "Twitter"},
-            {"url": "https://www.instagram.com/{}", "name": "Instagram"},
-            {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
-            {"url": "https://www.github.com/{}", "name": "GitHub"},
-            {"url": "https://www.pinterest.com/{}", "name": "Pinterest"},
-            {"url": "https://www.tumblr.com/{}", "name": "Tumblr"},
-            {"url": "https://www.youtube.com/{}", "name": "Youtube"},
-            {"url": "https://soundcloud.com/{}", "name": "SoundCloud"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.tiktok.com/@{}", "name": "TikTok"},
-            {"url": "https://www.behance.net/{}", "name": "Behance"},
-            {"url": "https://www.medium.com/@{}", "name": "Medium"},
-            {"url": "https://www.quora.com/profile/{}", "name": "Quora"},
-            {"url": "https://www.flickr.com/people/{}", "name": "Flickr"},
-            {"url": "https://www.periscope.tv/{}", "name": "Periscope"},
-            {"url": "https://www.twitch.tv/{}", "name": "Twitch"},
-            {"url": "https://www.dribbble.com/{}", "name": "Dribbble"},
-            {"url": "https://www.stumbleupon.com/stumbler/{}", "name": "StumbleUpon"},
-            {"url": "https://www.ello.co/{}", "name": "Ello"},
-            {"url": "https://www.producthunt.com/@{}", "name": "Product Hunt"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.telegram.me/{}", "name": "Telegram"},
-            {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
-        ]
-        for site in social_media:
-            url = site['url'].format(username)
-            response = requests.get(url)
-            if response.status_code == 200:
-                results[site['name']] = url
-            else:
-                results[site['name']] = (f"{Ye}Username not found {Ye}!")
-    except Exception as e:
-        print(f"{Re}Error : {e}")
-        return
+        username = input(f"\n {Wh}Enter Username : {Gr}").strip()
+        if not username:
+            print(f"\n {Re}Username cannot be empty!")
+            return
 
-    print(f"\n {Wh}========== {Gr}SHOW INFORMATION USERNAME {Wh}==========")
-    print()
-    for site, url in results.items():
-        print(f" {Wh}[ {Gr}+ {Wh}] {site} : {Gr}{url}")
+        print(f"\n {Wh}[{Gr} * {Wh}] Searching {Gr}{len(SOCIAL_MEDIA)}{Wh} sites for \"{Gr}{username}{Wh}\" ...\n")
+
+        found = []
+        not_found = []
+
+        session = requests.Session()
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+            futures = {
+                pool.submit(_check_site, site, username, session): site
+                for site in SOCIAL_MEDIA
+            }
+            for future in as_completed(futures):
+                name, url = future.result()
+                if url:
+                    found.append((name, url))
+                    print(f" {Wh}[ {Gr}+ {Wh}] {name}: {Gr}{url}")
+                else:
+                    not_found.append(name)
+                    print(f" {Wh}[ {Ye}- {Wh}] {name}: {Ye}Not Found")
+
+        print(f"\n {Wh}========== {Gr}SEARCH COMPLETE {Wh}==========")
+        print(f" {Wh}[{Gr} + {Wh}] Found    : {Gr}{len(found)}{Wh} sites")
+        print(f" {Wh}[{Ye} - {Wh}] Not Found: {Ye}{len(not_found)}{Wh} sites")
+
+    except Exception as e:
+        print(f"\n{Re}Error : {e}")
 
 
 @is_option
 def showIP():
-    respone = requests.get('https://api.ipify.org/')
+    respone = requests.get('https://api.ipify.org/', headers=HEADERS, timeout=REQUEST_TIMEOUT)
     Show_IP = respone.text
 
     print(f"\n {Wh}========== {Gr}SHOW INFORMATION YOUR IP {Wh}==========")
@@ -259,13 +378,14 @@ def is_in_options(num):
 def option():
     # BANNER TOOLS
     clear()
-    stderr.writelines(f"""
+    banner_art = r"""
        ________               __      ______                __  
       / ____/ /_  ____  _____/ /_    /_  __/________ ______/ /__
      / / __/ __ \/ __ \/ ___/ __/_____/ / / ___/ __ `/ ___/ //_/
     / /_/ / / / / /_/ (__  ) /_/_____/ / / /  / /_/ / /__/ ,<   
     \____/_/ /_/\____/____/\__/     /_/ /_/   \__,_/\___/_/|_| 
-
+"""
+    stderr.writelines(f"""{banner_art}
               {Wh}[ + ]  C O D E   B Y  H U N X  [ + ]
     """)
 
