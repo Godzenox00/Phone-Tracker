@@ -4,7 +4,7 @@
 # << KALAU DI ATAS TIDAK DI IKUTI MAKA AKAN MENDAPATKAN DOSA KARENA MIMIN GAK IKHLAS
 # “Wahai orang-orang yang beriman! Janganlah kamu saling memakan harta sesamamu dengan jalan yang batil,” (QS. An Nisaa': 29). Rasulullah SAW juga melarang umatnya untuk mengambil hak orang lain tanpa izin.
 
-# Translated to English
+# Translated to English 
 # << WANT TO RECODE??? PERMISSION FIRST, AT LEAST THE GITHUB MIMIN ACCOUNT TAG THAT LEADS TO THIS ACCOUNT, IS EASIER TO USE FORK
 # << IF YOU DON'T FOLLOW THE ABOVE, YOU WILL SIN BECAUSE YOU ARE NOT SINCERE
 # “O you who believe! Do not consume each other's wealth in a false way,” (QS. An Nisaa': 29). Rasulullah SAW also prohibited his people from taking other people's rights without permission.
