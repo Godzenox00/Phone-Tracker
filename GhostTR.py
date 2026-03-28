@@ -4,8 +4,12 @@
 # << KALAU DI ATAS TIDAK DI IKUTI MAKA AKAN MENDAPATKAN DOSA KARENA MIMIN GAK IKHLAS
 # “Wahai orang-orang yang beriman! Janganlah kamu saling memakan harta sesamamu dengan jalan yang batil,” (QS. An Nisaa': 29). Rasulullah SAW juga melarang umatnya untuk mengambil hak orang lain tanpa izin.
 
-# IMPORT MODULE
+# Translated to English
+# << WANT TO RECODE??? PERMISSION FIRST, AT LEAST THE GITHUB MIMIN ACCOUNT TAG THAT LEADS TO THIS ACCOUNT, IS EASIER TO USE FORK
+# << IF YOU DON'T FOLLOW THE ABOVE, YOU WILL SIN BECAUSE YOU ARE NOT SINCERE
+# “O you who believe! Do not consume each other's wealth in a false way,” (QS. An Nisaa': 29). Rasulullah SAW also prohibited his people from taking other people's rights without permission.
 
+# IMPORT MODULE
 import json
 import requests
 import time
@@ -31,8 +35,6 @@ def is_option(func):
     def wrapper(*args, **kwargs):
         run_banner()
         func(*args, **kwargs)
-
-
     return wrapper
 
 
@@ -74,7 +76,7 @@ def IP_Track():
     print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
     print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
     print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
+    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"].get("current_time", "N/A"))
 
 
 @is_option
@@ -149,16 +151,31 @@ def TrackLu():
             {"url": "https://www.telegram.me/{}", "name": "Telegram"},
             {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
         ]
+        
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+
         for site in social_media:
             url = site['url'].format(username)
-            response = requests.get(url)
-            if response.status_code == 200:
-                results[site['name']] = url
-            else:
-                results[site['name']] = (f"{Ye}Username not found {Ye}!")
+            try:
+                response = requests.get(url, headers=headers, timeout=5)
+                if response.status_code == 200:
+                    results[site['name']] = url
+                else:
+                    results[site['name']] = (f"{Ye}Username not found {Ye}!")
+            except requests.exceptions.SSLError:
+                results[site['name']] = (f"{Re}SSL Error (Security Blocked){Wh}")
+            except requests.exceptions.RequestException:
+                results[site['name']] = (f"{Re}Connection Failed{Wh}")
+            except Exception as e:
+                results[site['name']] = (f"{Re}Error: {str(e)[:20]}...{Wh}")
     except Exception as e:
         print(f"{Re}Error : {e}")
         return
+    
 
     print(f"\n {Wh}========== {Gr}SHOW INFORMATION USERNAME {Wh}==========")
     print()
@@ -226,21 +243,16 @@ def call_option(opt):
             else:
                 print('No function detected')
 
-
 def execute_option(opt):
     try:
         call_option(opt)
-        input(f'\n{Wh}[ {Gr}+ {Wh}] {Gr}Press enter to continue')
-        main()
+        input(f'\n{Wh}[ {Gr}+ {Wh}] {Gr}Press enter to return to menu...')
     except ValueError as e:
-        print(e)
+        print(f"\n{Re}Error: {e}")
         time.sleep(2)
-        execute_option(opt)
     except KeyboardInterrupt:
         print(f'\n{Wh}[ {Re}! {Wh}] {Re}Exit')
-        time.sleep(2)
         exit()
-
 
 def option_text():
     text = ''
@@ -292,19 +304,25 @@ def run_banner():
         """)
     time.sleep(0.5)
 
-
 def main():
-    clear()
-    option()
-    time.sleep(1)
-    try:
-        opt = int(input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}"))
-        execute_option(opt)
-    except ValueError:
-        print(f'\n{Wh}[ {Re}! {Wh}] {Re}Please input number')
-        time.sleep(2)
-        main()
-
+    while True:
+        clear()
+        option()
+        try:
+            opt_input = input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}")
+            if not opt_input.strip(): # Handles empty enter keys
+                continue
+            
+            opt = int(opt_input)            
+            
+            if opt == 0:
+                print(f'\n{Wh}[ {Re}! {Wh}] {Re}Exiting...')
+                break 
+                
+            execute_option(opt)
+        except ValueError:
+            print(f'\n{Wh}[ {Re}! {Wh}] {Re}Please input a valid number')
+            time.sleep(2)
 
 if __name__ == '__main__':
     try:
