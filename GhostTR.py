@@ -1,10 +1,5 @@
 #!/usr/bin/python
-# << CODE BY HUNX04
-# << MAU RECODE ??? IZIN DULU LAH,  MINIMAL TAG AKUN GITHUB MIMIN YANG MENGARAH KE AKUN INI, LEBIH GAMPANG SI PAKE FORK
-# << KALAU DI ATAS TIDAK DI IKUTI MAKA AKAN MENDAPATKAN DOSA KARENA MIMIN GAK IKHLAS
-# “Wahai orang-orang yang beriman! Janganlah kamu saling memakan harta sesamamu dengan jalan yang batil,” (QS. An Nisaa': 29). Rasulullah SAW juga melarang umatnya untuk mengambil hak orang lain tanpa izin.
-
-# IMPORT MODULE
+# UPDATED VERSION WITH NEW FEATURE
 
 import json
 import requests
@@ -14,7 +9,7 @@ import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
 
-Bl = '\033[30m'  # VARIABLE BUAT WARNA CUYY
+Bl = '\033[30m'
 Re = '\033[1;31m'
 Gr = '\033[1;32m'
 Ye = '\033[1;33m'
@@ -24,17 +19,209 @@ Cy = '\033[1;36m'
 Wh = '\033[1;37m'
 
 
-# utilities
-
-# decorator for attaching run_banner to a function
+# DECORATOR
 def is_option(func):
     def wrapper(*args, **kwargs):
         run_banner()
         func(*args, **kwargs)
-
-
     return wrapper
 
+
+# -----------------------------
+# FEATURES
+# -----------------------------
+
+@is_option
+def IP_Track():
+    ip = input(f"{Wh}\n Enter IP target : {Gr}")
+    print()
+
+    try:
+        req_api = requests.get(f"http://ipwho.is/{ip}")
+        ip_data = json.loads(req_api.text)
+
+        print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
+        print(f"{Wh}\n IP target       :{Gr} {ip}")
+        print(f"{Wh} Type IP         :{Gr} {ip_data['type']}")
+        print(f"{Wh} Country         :{Gr} {ip_data['country']}")
+        print(f"{Wh} Country Code    :{Gr} {ip_data['country_code']}")
+        print(f"{Wh} City            :{Gr} {ip_data['city']}")
+        print(f"{Wh} Region          :{Gr} {ip_data['region']}")
+        print(f"{Wh} Latitude        :{Gr} {ip_data['latitude']}")
+        print(f"{Wh} Longitude       :{Gr} {ip_data['longitude']}")
+        print(f"{Wh} ISP             :{Gr} {ip_data['connection']['isp']}")
+        print(f"{Wh} Domain          :{Gr} {ip_data['connection']['domain']}")
+        print(f"{Wh} Timezone        :{Gr} {ip_data['timezone']['id']}")
+        print(f"{Wh} Current Time    :{Gr} {ip_data['timezone']['current_time']}")
+
+    except:
+        print(f"{Re}Failed to fetch IP data")
+
+
+@is_option
+def showIP():
+    try:
+        response = requests.get("https://api.ipify.org/")
+        print(f"\n {Wh}========== {Gr}YOUR IP ADDRESS {Wh}==========")
+        print(f"\n {Wh}[{Gr}+{Wh}] Your IP : {Gr}{response.text}")
+    except:
+        print(f"{Re}Unable to fetch IP")
+
+
+@is_option
+def phoneGW():
+    try:
+        User_phone = input(
+            f"\n {Wh}Enter phone number {Gr}[+91xxxxxxxxxx] {Wh}: {Gr}"
+        )
+
+        parsed_number = phonenumbers.parse(User_phone, None)
+
+        print(f"\n {Wh}========== {Gr}PHONE INFORMATION {Wh}==========")
+        print(f"{Wh}Valid Number     :{Gr} {phonenumbers.is_valid_number(parsed_number)}")
+        print(f"{Wh}Country Code     :{Gr} {parsed_number.country_code}")
+        print(f"{Wh}Location         :{Gr} {geocoder.description_for_number(parsed_number,'en')}")
+        print(f"{Wh}Carrier          :{Gr} {carrier.name_for_number(parsed_number,'en')}")
+        print(f"{Wh}Timezone         :{Gr} {timezone.time_zones_for_number(parsed_number)}")
+
+    except:
+        print(f"{Re}Invalid Number")
+
+
+@is_option
+def TrackLu():
+    username = input(f"\n {Wh}Enter Username : {Gr}")
+
+    social_media = {
+        "Facebook": f"https://facebook.com/{username}",
+        "Instagram": f"https://instagram.com/{username}",
+        "Twitter": f"https://twitter.com/{username}",
+        "GitHub": f"https://github.com/{username}",
+        "TikTok": f"https://tiktok.com/@{username}",
+        "YouTube": f"https://youtube.com/{username}",
+    }
+
+    print(f"\n {Wh}========== {Gr}USERNAME SEARCH {Wh}==========")
+
+    for name, url in social_media.items():
+        try:
+            r = requests.get(url, timeout=5)
+            if r.status_code == 200:
+                print(f"{Wh}[{Gr}+{Wh}] {name:<10}:{Gr} Found -> {url}")
+            else:
+                print(f"{Wh}[{Re}!{Wh}] {name:<10}:{Ye} Not Found")
+        except:
+            print(f"{Wh}[{Re}!{Wh}] {name:<10}:{Ye} Error")
+
+
+# -----------------------------
+# NEW FEATURE
+# -----------------------------
+
+@is_option
+def websiteChecker():
+    try:
+        site = input(f"\n {Wh}Enter Website URL {Gr}[google.com] {Wh}: {Gr}")
+
+        if not site.startswith("http://") and not site.startswith("https://"):
+            site = "https://" + site
+
+        response = requests.get(site, timeout=5)
+
+        print(f"\n {Wh}========== {Gr}WEBSITE STATUS {Wh}==========")
+        print(f"{Wh}URL            :{Gr} {site}")
+        print(f"{Wh}Status Code    :{Gr} {response.status_code}")
+        print(f"{Wh}Server         :{Gr} {response.headers.get('Server','Unknown')}")
+        print(f"{Wh}Content Type   :{Gr} {response.headers.get('Content-Type','Unknown')}")
+
+        if response.status_code == 200:
+            print(f"{Wh}Status         :{Gr} Website Online")
+        else:
+            print(f"{Wh}Status         :{Ye} Website Responded")
+
+    except Exception as e:
+        print(f"{Wh}Status         :{Re} Offline / Error")
+        print(f"{Wh}Reason         :{Re} {e}")
+
+
+# -----------------------------
+# MENU OPTIONS
+# -----------------------------
+
+options = [
+    {'num': 1, 'text': 'IP Tracker', 'func': IP_Track},
+    {'num': 2, 'text': 'Show Your IP', 'func': showIP},
+    {'num': 3, 'text': 'Phone Number Tracker', 'func': phoneGW},
+    {'num': 4, 'text': 'Username Tracker', 'func': TrackLu},
+    {'num': 5, 'text': 'Website Status Checker', 'func': websiteChecker},
+    {'num': 0, 'text': 'Exit', 'func': exit}
+]
+
+
+# -----------------------------
+# SYSTEM FUNCTIONS
+# -----------------------------
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def run_banner():
+    clear()
+    stderr.writelines(f"""{Wh}
+   ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗
+  ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝
+  ██║  ███╗███████║██║   ██║███████╗   ██║
+  ██║   ██║██╔══██║██║   ██║╚════██║   ██║
+  ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║
+   ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝
+
+        {Gr}GHOST TRACKER TOOL
+{Wh}
+""")
+
+
+def option_text():
+    text = ""
+    for opt in options:
+        text += f"{Wh}[ {opt['num']} ] {Gr}{opt['text']}\n"
+    return text
+
+
+def call_option(opt):
+    for option in options:
+        if option['num'] == opt:
+            option['func']()
+            return
+    print(f"{Re}Invalid Option")
+
+
+def main():
+    while True:
+        clear()
+        run_banner()
+        print(option_text())
+
+        try:
+            opt = int(input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}"))
+            call_option(opt)
+
+            if opt == 0:
+                break
+
+            input(f"\n{Wh}Press Enter To Continue...")
+
+        except KeyboardInterrupt:
+            print(f"\n{Re}Exit")
+            break
+
+        except:
+            print(f"{Re}Please enter number only")
+            time.sleep(2)
+
+
+if __name__ == "__main__":
+    main()
 
 # FUNCTIONS FOR MENU
 @is_option
