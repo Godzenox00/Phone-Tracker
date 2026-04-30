@@ -74,7 +74,7 @@ def IP_Track():
     print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
     print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
     print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
+    print(f"{Wh} Current Time :{Gr}", ip_data.get("timezone", {}).get("current_time", "N/A"))
 
 
 @is_option
