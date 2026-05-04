@@ -231,11 +231,9 @@ def execute_option(opt):
     try:
         call_option(opt)
         input(f'\n{Wh}[ {Gr}+ {Wh}] {Gr}Press enter to continue')
-        main()
     except ValueError as e:
         print(e)
         time.sleep(2)
-        execute_option(opt)
     except KeyboardInterrupt:
         print(f'\n{Wh}[ {Re}! {Wh}] {Re}Exit')
         time.sleep(2)
@@ -259,7 +257,7 @@ def is_in_options(num):
 def option():
     # BANNER TOOLS
     clear()
-    stderr.writelines(f"""
+    stderr.writelines(rf"""
        ________               __      ______                __  
       / ____/ /_  ____  _____/ /_    /_  __/________ ______/ /__
      / / __/ __ \/ __ \/ ___/ __/_____/ / / ___/ __ `/ ___/ //_/
@@ -294,16 +292,20 @@ def run_banner():
 
 
 def main():
-    clear()
-    option()
-    time.sleep(1)
-    try:
-        opt = int(input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}"))
-        execute_option(opt)
-    except ValueError:
-        print(f'\n{Wh}[ {Re}! {Wh}] {Re}Please input number')
-        time.sleep(2)
-        main()
+    while True:
+        clear()
+        option()
+        time.sleep(1)
+        try:
+            opt = int(input(f"{Wh}\n [ + ] {Gr}Select Option : {Wh}"))
+            execute_option(opt)
+        except ValueError:
+            print(f'\n{Wh}[ {Re}! {Wh}] {Re}Please input number')
+            time.sleep(2)
+        except EOFError:
+            print(f'\n{Wh}[ {Re}! {Wh}] {Re}No input detected. Exit')
+            time.sleep(1)
+            exit()
 
 
 if __name__ == '__main__':
