@@ -42,39 +42,63 @@ def IP_Track():
     ip = input(f"{Wh}\n Enter IP target : {Gr}")  # INPUT IP ADDRESS
     print()
     print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
-    req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
-    ip_data = json.loads(req_api.text)
-    time.sleep(2)
+    try:
+        req_api = requests.get(f"http://ipwho.is/{ip}", timeout=10)
+        try:
+            ip_data = req_api.json()
+        except ValueError:
+            print(f"{Re}Invalid JSON response from IP service")
+            return
+    except requests.RequestException as e:
+        print(f"{Re}Network error while contacting IP service: {e}")
+        return
+    time.sleep(1)
+
+    # ipwho.is returns a success boolean for reserved/private IPs or errors
+    if not ip_data.get('success', True):
+        msg = ip_data.get('message', 'No information available for this IP')
+        print(f"{Ye}{msg}")
+        return
+
     print(f"{Wh}\n IP target       :{Gr}", ip)
-    print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
-    print(f"{Wh} Country         :{Gr}", ip_data["country"])
-    print(f"{Wh} Country Code    :{Gr}", ip_data["country_code"])
-    print(f"{Wh} City            :{Gr}", ip_data["city"])
-    print(f"{Wh} Continent       :{Gr}", ip_data["continent"])
-    print(f"{Wh} Continent Code  :{Gr}", ip_data["continent_code"])
-    print(f"{Wh} Region          :{Gr}", ip_data["region"])
-    print(f"{Wh} Region Code     :{Gr}", ip_data["region_code"])
-    print(f"{Wh} Latitude        :{Gr}", ip_data["latitude"])
-    print(f"{Wh} Longitude       :{Gr}", ip_data["longitude"])
-    lat = int(ip_data['latitude'])
-    lon = int(ip_data['longitude'])
-    print(f"{Wh} Maps            :{Gr}", f"https://www.google.com/maps/@{lat},{lon},8z")
-    print(f"{Wh} EU              :{Gr}", ip_data["is_eu"])
-    print(f"{Wh} Postal          :{Gr}", ip_data["postal"])
-    print(f"{Wh} Calling Code    :{Gr}", ip_data["calling_code"])
-    print(f"{Wh} Capital         :{Gr}", ip_data["capital"])
-    print(f"{Wh} Borders         :{Gr}", ip_data["borders"])
-    print(f"{Wh} Country Flag    :{Gr}", ip_data["flag"]["emoji"])
-    print(f"{Wh} ASN             :{Gr}", ip_data["connection"]["asn"])
-    print(f"{Wh} ORG             :{Gr}", ip_data["connection"]["org"])
-    print(f"{Wh} ISP             :{Gr}", ip_data["connection"]["isp"])
-    print(f"{Wh} Domain          :{Gr}", ip_data["connection"]["domain"])
-    print(f"{Wh} ID              :{Gr}", ip_data["timezone"]["id"])
-    print(f"{Wh} ABBR            :{Gr}", ip_data["timezone"]["abbr"])
-    print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
-    print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
-    print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
+    print(f"{Wh} Type IP         :{Gr}", ip_data.get("type", "N/A"))
+    print(f"{Wh} Country         :{Gr}", ip_data.get("country", "N/A"))
+    print(f"{Wh} Country Code    :{Gr}", ip_data.get("country_code", "N/A"))
+    print(f"{Wh} City            :{Gr}", ip_data.get("city", "N/A"))
+    print(f"{Wh} Continent       :{Gr}", ip_data.get("continent", "N/A"))
+    print(f"{Wh} Continent Code  :{Gr}", ip_data.get("continent_code", "N/A"))
+    print(f"{Wh} Region          :{Gr}", ip_data.get("region", "N/A"))
+    print(f"{Wh} Region Code     :{Gr}", ip_data.get("region_code", "N/A"))
+    lat = ip_data.get('latitude')
+    lon = ip_data.get('longitude')
+    print(f"{Wh} Latitude        :{Gr}", lat)
+    print(f"{Wh} Longitude       :{Gr}", lon)
+    try:
+        if lat is not None and lon is not None:
+            latf = float(lat)
+            lonf = float(lon)
+            print(f"{Wh} Maps            :{Gr}", f"https://www.google.com/maps/@{latf},{lonf},8z")
+    except (TypeError, ValueError):
+        pass
+    print(f"{Wh} EU              :{Gr}", ip_data.get("is_eu", "N/A"))
+    print(f"{Wh} Postal          :{Gr}", ip_data.get("postal", "N/A"))
+    print(f"{Wh} Calling Code    :{Gr}", ip_data.get("calling_code", "N/A"))
+    print(f"{Wh} Capital         :{Gr}", ip_data.get("capital", "N/A"))
+    print(f"{Wh} Borders         :{Gr}", ip_data.get("borders", "N/A"))
+    flag = ip_data.get("flag", {})
+    print(f"{Wh} Country Flag    :{Gr}", flag.get("emoji", "N/A"))
+    conn = ip_data.get("connection", {})
+    print(f"{Wh} ASN             :{Gr}", conn.get("asn", "N/A"))
+    print(f"{Wh} ORG             :{Gr}", conn.get("org", "N/A"))
+    print(f"{Wh} ISP             :{Gr}", conn.get("isp", "N/A"))
+    print(f"{Wh} Domain          :{Gr}", conn.get("domain", "N/A"))
+    tz = ip_data.get("timezone", {})
+    print(f"{Wh} ID              :{Gr}", tz.get("id", "N/A"))
+    print(f"{Wh} ABBR            :{Gr}", tz.get("abbr", "N/A"))
+    print(f"{Wh} DST             :{Gr}", tz.get("is_dst", "N/A"))
+    print(f"{Wh} Offset          :{Gr}", tz.get("offset", "N/A"))
+    print(f"{Wh} UTC             :{Gr}", tz.get("utc", "N/A"))
+    print(f"{Wh} Current Time    :{Gr}", tz.get("current_time", "N/A"))
 
 
 @is_option
