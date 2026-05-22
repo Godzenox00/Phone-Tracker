@@ -259,7 +259,7 @@ def is_in_options(num):
 def option():
     # BANNER TOOLS
     clear()
-    stderr.writelines(f"""
+    stderr.writelines(fr"""
        ________               __      ______                __  
       / ____/ /_  ____  _____/ /_    /_  __/________ ______/ /__
      / / __/ __ \/ __ \/ ___/ __/_____/ / / ___/ __ `/ ___/ //_/
@@ -275,7 +275,7 @@ def option():
 def run_banner():
     clear()
     time.sleep(1)
-    stderr.writelines(f"""{Wh}
+    stderr.writelines(fr"""{Wh}
          .-.
        .'   `.          {Wh}--------------------------------
        :g g   :         {Wh}| {Gr}GHOST - TRACKER - IP ADDRESS {Wh}|

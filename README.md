@@ -18,6 +18,23 @@ pkg install git
 pkg install python3
 ```
 
+### Installation on Windows
+Install Python 3 from <a href="https://www.python.org/downloads/windows/">python.org</a>. During installation, enable the checkbox to add Python to PATH.
+
+Then run:
+```powershell
+git clone https://github.com/HunxByts/GhostTrack.git
+cd GhostTrack
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe GhostTR.py
+```
+
+You can also start the tool with:
+```powershell
+.\run-windows.bat
+```
+
 ### Usage Tool
 ```
 git clone https://github.com/HunxByts/GhostTrack.git
