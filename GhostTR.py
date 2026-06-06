@@ -74,7 +74,7 @@ def IP_Track():
     print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
     print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
     print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
+    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"].get("current_time", "N/A"))  # ip_data["timezone"]["current_time"] — the ipwho.is API doesn't always include current_time. When it's missing, Python raises KeyError
 
 
 @is_option
@@ -232,7 +232,7 @@ def execute_option(opt):
         call_option(opt)
         input(f'\n{Wh}[ {Gr}+ {Wh}] {Gr}Press enter to continue')
         main()
-    except ValueError as e:
+    except (ValueError, KeyError) as e:
         print(e)
         time.sleep(2)
         execute_option(opt)
