@@ -6,13 +6,13 @@ Useful tool to track location or mobile number, so this tool can be called osint
 New update :
 ```Version 2.2```
 
-### Instalation on Linux (deb)
+### Installation on Linux (deb)
 ```
 sudo apt-get install git
 sudo apt-get install python3
 ```
 
-### Instalation on Termux
+### Installation on Termux
 ```
 pkg install git
 pkg install python3
