@@ -43,7 +43,9 @@ def IP_Track():
     print()
     print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
     req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
-    ip_data = json.loads(req_api.text)
+    ip_data = req_api.json()
+    import pprint
+    pprint.pprint(ip_data)
     time.sleep(2)
     print(f"{Wh}\n IP target       :{Gr}", ip)
     print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
@@ -74,8 +76,7 @@ def IP_Track():
     print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
     print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
     print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
-
+    print(f"{Wh} Current Time    :{Gr}", ip_data.get("timezone", {}).get("current_time", "N/A"))
 
 @is_option
 def phoneGW():
