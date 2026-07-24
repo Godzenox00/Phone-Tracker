@@ -10,6 +10,7 @@ import json
 import requests
 import time
 import os
+from datetime import datetime, timezone as dt_timezone, timedelta
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
@@ -69,12 +70,23 @@ def IP_Track():
     print(f"{Wh} ORG             :{Gr}", ip_data["connection"]["org"])
     print(f"{Wh} ISP             :{Gr}", ip_data["connection"]["isp"])
     print(f"{Wh} Domain          :{Gr}", ip_data["connection"]["domain"])
-    print(f"{Wh} ID              :{Gr}", ip_data["timezone"]["id"])
-    print(f"{Wh} ABBR            :{Gr}", ip_data["timezone"]["abbr"])
-    print(f"{Wh} DST             :{Gr}", ip_data["timezone"]["is_dst"])
-    print(f"{Wh} Offset          :{Gr}", ip_data["timezone"]["offset"])
-    print(f"{Wh} UTC             :{Gr}", ip_data["timezone"]["utc"])
-    print(f"{Wh} Current Time    :{Gr}", ip_data["timezone"]["current_time"])
+    tz = ip_data.get("timezone") or {}
+    print(f"{Wh} ID              :{Gr}", tz.get("id", "N/A"))
+    print(f"{Wh} ABBR            :{Gr}", tz.get("abbr", "N/A"))
+    print(f"{Wh} DST             :{Gr}", tz.get("is_dst", "N/A"))
+    print(f"{Wh} Offset          :{Gr}", tz.get("offset", "N/A"))
+    print(f"{Wh} UTC             :{Gr}", tz.get("utc", "N/A"))
+    # ipwho.is no longer always returns current_time; derive it from offset when missing
+    current_time = tz.get("current_time")
+    if not current_time and tz.get("offset") is not None:
+        try:
+            local_tz = dt_timezone(timedelta(seconds=int(tz["offset"])))
+            current_time = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
+            if tz.get("abbr"):
+                current_time = f"{current_time} {tz['abbr']}"
+        except (TypeError, ValueError, OverflowError):
+            current_time = "N/A"
+    print(f"{Wh} Current Time    :{Gr}", current_time or "N/A")
 
 
 @is_option
@@ -120,45 +132,53 @@ def phoneGW():
 
 @is_option
 def TrackLu():
-    try:
-        username = input(f"\n {Wh}Enter Username : {Gr}")
-        results = {}
-        social_media = [
-            {"url": "https://www.facebook.com/{}", "name": "Facebook"},
-            {"url": "https://www.twitter.com/{}", "name": "Twitter"},
-            {"url": "https://www.instagram.com/{}", "name": "Instagram"},
-            {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
-            {"url": "https://www.github.com/{}", "name": "GitHub"},
-            {"url": "https://www.pinterest.com/{}", "name": "Pinterest"},
-            {"url": "https://www.tumblr.com/{}", "name": "Tumblr"},
-            {"url": "https://www.youtube.com/{}", "name": "Youtube"},
-            {"url": "https://soundcloud.com/{}", "name": "SoundCloud"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.tiktok.com/@{}", "name": "TikTok"},
-            {"url": "https://www.behance.net/{}", "name": "Behance"},
-            {"url": "https://www.medium.com/@{}", "name": "Medium"},
-            {"url": "https://www.quora.com/profile/{}", "name": "Quora"},
-            {"url": "https://www.flickr.com/people/{}", "name": "Flickr"},
-            {"url": "https://www.periscope.tv/{}", "name": "Periscope"},
-            {"url": "https://www.twitch.tv/{}", "name": "Twitch"},
-            {"url": "https://www.dribbble.com/{}", "name": "Dribbble"},
-            {"url": "https://www.stumbleupon.com/stumbler/{}", "name": "StumbleUpon"},
-            {"url": "https://www.ello.co/{}", "name": "Ello"},
-            {"url": "https://www.producthunt.com/@{}", "name": "Product Hunt"},
-            {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
-            {"url": "https://www.telegram.me/{}", "name": "Telegram"},
-            {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
-        ]
-        for site in social_media:
-            url = site['url'].format(username)
-            response = requests.get(url)
+    username = input(f"\n {Wh}Enter Username : {Gr}")
+    results = {}
+    social_media = [
+        {"url": "https://www.facebook.com/{}", "name": "Facebook"},
+        {"url": "https://www.twitter.com/{}", "name": "Twitter"},
+        {"url": "https://www.instagram.com/{}", "name": "Instagram"},
+        {"url": "https://www.linkedin.com/in/{}", "name": "LinkedIn"},
+        {"url": "https://www.github.com/{}", "name": "GitHub"},
+        {"url": "https://www.pinterest.com/{}", "name": "Pinterest"},
+        {"url": "https://www.tumblr.com/{}", "name": "Tumblr"},
+        {"url": "https://www.youtube.com/{}", "name": "Youtube"},
+        {"url": "https://soundcloud.com/{}", "name": "SoundCloud"},
+        {"url": "https://www.snapchat.com/add/{}", "name": "Snapchat"},
+        {"url": "https://www.tiktok.com/@{}", "name": "TikTok"},
+        {"url": "https://www.behance.net/{}", "name": "Behance"},
+        {"url": "https://www.medium.com/@{}", "name": "Medium"},
+        {"url": "https://www.quora.com/profile/{}", "name": "Quora"},
+        {"url": "https://www.flickr.com/people/{}", "name": "Flickr"},
+        {"url": "https://www.periscope.tv/{}", "name": "Periscope"},
+        {"url": "https://www.twitch.tv/{}", "name": "Twitch"},
+        {"url": "https://www.dribbble.com/{}", "name": "Dribbble"},
+        {"url": "https://www.stumbleupon.com/stumbler/{}", "name": "StumbleUpon"},
+        {"url": "https://www.ello.co/{}", "name": "Ello"},
+        {"url": "https://www.producthunt.com/@{}", "name": "Product Hunt"},
+        {"url": "https://www.telegram.me/{}", "name": "Telegram"},
+        {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
+    ]
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        )
+    }
+    print(f"\n {Wh}Scanning username across sites (timeouts are skipped)...\n")
+    for site in social_media:
+        url = site['url'].format(username)
+        try:
+            response = requests.get(url, headers=headers, timeout=8, allow_redirects=True)
             if response.status_code == 200:
                 results[site['name']] = url
             else:
-                results[site['name']] = (f"{Ye}Username not found {Ye}!")
-    except Exception as e:
-        print(f"{Re}Error : {e}")
-        return
+                results[site['name']] = f"{Ye}Username not found{Wh}"
+        except requests.exceptions.Timeout:
+            results[site['name']] = f"{Ye}Timeout / unreachable{Wh}"
+        except requests.exceptions.RequestException:
+            results[site['name']] = f"{Ye}Connection error{Wh}"
 
     print(f"\n {Wh}========== {Gr}SHOW INFORMATION USERNAME {Wh}==========")
     print()
