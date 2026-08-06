@@ -123,6 +123,7 @@ def TrackLu():
     try:
         username = input(f"\n {Wh}Enter Username : {Gr}")
         results = {}
+
         social_media = [
             {"url": "https://www.facebook.com/{}", "name": "Facebook"},
             {"url": "https://www.twitter.com/{}", "name": "Twitter"},
@@ -149,44 +150,46 @@ def TrackLu():
             {"url": "https://www.telegram.me/{}", "name": "Telegram"},
             {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
         ]
+
         for site in social_media:
-    url = site['url'].format(username)
+            url = site["url"].format(username)
 
-    print(f"[*] Checking {site['name']}...")
+            print(f"[*] Checking {site['name']}...")
 
-    try:
-        response = requests.get(
-            url,
-            timeout=5,
-            headers={
-                "User-Agent": "Mozilla/5.0"
-            }
-        )
+            try:
+                response = requests.get(
+                    url,
+                    timeout=5,
+                    headers={
+                        "User-Agent": "Mozilla/5.0"
+                    }
+                )
 
-        if response.status_code == 200:
-            results[site['name']] = url
-        elif response.status_code == 404:
-            results[site['name']] = f"{Ye}Username not found{Wh}!"
-        else:
-            results[site['name']] = f"Status Code : {response.status_code}"
+                if response.status_code == 200:
+                    results[site["name"]] = url
+                elif response.status_code == 404:
+                    results[site["name"]] = f"{Ye}Username not found{Wh}!"
+                else:
+                    results[site["name"]] = f"Status Code : {response.status_code}"
 
-    except requests.exceptions.Timeout:
-        results[site['name']] = "Timeout"
+            except requests.exceptions.Timeout:
+                results[site["name"]] = "Timeout"
 
-    except requests.exceptions.ConnectionError:
-        results[site['name']] = "Connection Error"
+            except requests.exceptions.ConnectionError:
+                results[site["name"]] = "Connection Error"
 
-    except requests.exceptions.RequestException as e:
-        results[site['name']] = f"Error : {e}"
+            except requests.exceptions.RequestException as e:
+                results[site["name"]] = f"Error : {e}"
+
     except Exception as e:
         print(f"{Re}Error : {e}")
         return
 
     print(f"\n {Wh}========== {Gr}SHOW INFORMATION USERNAME {Wh}==========")
     print()
+
     for site, url in results.items():
         print(f" {Wh}[ {Gr}+ {Wh}] {site} : {Gr}{url}")
-
 
 @is_option
 def showIP():
