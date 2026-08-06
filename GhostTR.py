@@ -150,12 +150,34 @@ def TrackLu():
             {"url": "https://www.weheartit.com/{}", "name": "We Heart It"}
         ]
         for site in social_media:
-            url = site['url'].format(username)
-            response = requests.get(url)
-            if response.status_code == 200:
-                results[site['name']] = url
-            else:
-                results[site['name']] = (f"{Ye}Username not found {Ye}!")
+    url = site['url'].format(username)
+
+    print(f"[*] Checking {site['name']}...")
+
+    try:
+        response = requests.get(
+            url,
+            timeout=5,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            }
+        )
+
+        if response.status_code == 200:
+            results[site['name']] = url
+        elif response.status_code == 404:
+            results[site['name']] = f"{Ye}Username not found{Wh}!"
+        else:
+            results[site['name']] = f"Status Code : {response.status_code}"
+
+    except requests.exceptions.Timeout:
+        results[site['name']] = "Timeout"
+
+    except requests.exceptions.ConnectionError:
+        results[site['name']] = "Connection Error"
+
+    except requests.exceptions.RequestException as e:
+        results[site['name']] = f"Error : {e}"
     except Exception as e:
         print(f"{Re}Error : {e}")
         return
