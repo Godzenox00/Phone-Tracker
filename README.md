@@ -36,13 +36,13 @@ on the IP Track menu, you can combo with the seeker tool to get the target IP
 - <strong><a href="https://github.com/thewhiteh4t/seeker">Get Seeker</a></strong>
 </details>
 
-Display on the menu ```Phone Tracker```
+Display on the menu ```8102462628```
 
 <img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/phone.png" />
 
 on this menu you can search for information from the target phone number
 
-Display on the menu ```Username Tracker```
+Display on the menu ```Asmit```
 
 <img src="https://github.com/HunxByts/GhostTrack/blob/main/asset/User.png"/>
 on this menu you can search for information from the target username on social media
