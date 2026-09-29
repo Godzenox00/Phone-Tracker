@@ -1,10 +1,9 @@
 #!/usr/bin/python
-# << CODE BY HUNX04
-# << MAU RECODE ??? IZIN DULU LAH,  MINIMAL TAG AKUN GITHUB MIMIN YANG MENGARAH KE AKUN INI, LEBIH GAMPANG SI PAKE FORK
-# << KALAU DI ATAS TIDAK DI IKUTI MAKA AKAN MENDAPATKAN DOSA KARENA MIMIN GAK IKHLAS
-# “Wahai orang-orang yang beriman! Janganlah kamu saling memakan harta sesamamu dengan jalan yang batil,” (QS. An Nisaa': 29). Rasulullah SAW juga melarang umatnya untuk mengambil hak orang lain tanpa izin.
+# << CODE BY ZENOX GOD
+# << WANT TO RECODE ??? ASK FOR PERMISSION FIRST, AT LEAST TAG THE MININ GITHUB ACCOUNT THAT POINTS TO THIS ACCOUNT, IT'S EASIER TO USE FORK
+# << IF THE ABOVE IS NOT FOLLOWED, IT WILL BE A SIN BECAUSE THE ADMIN DOES NOT ALLOW IT
 
-# IMPORT MODULE
+# IMPORT MODULES
 
 import json
 import requests
@@ -14,7 +13,7 @@ import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 from sys import stderr
 
-Bl = '\033[30m'  # VARIABLE BUAT WARNA CUYY
+Bl = '\033[30m'  # COLOR VARIABLES
 Re = '\033[1;31m'
 Gr = '\033[1;32m'
 Ye = '\033[1;33m'
@@ -41,12 +40,12 @@ def is_option(func):
 def IP_Track():
     ip = input(f"{Wh}\n Enter IP target : {Gr}")  # INPUT IP ADDRESS
     print()
-    print(f' {Wh}============= {Gr}SHOW INFORMATION IP ADDRESS {Wh}=============')
+    print(f' {Wh}============= {Gr}SHOW IP ADDRESS INFORMATION {Wh}=============')
     req_api = requests.get(f"http://ipwho.is/{ip}")  # API IPWHOIS.IS
     ip_data = json.loads(req_api.text)
     time.sleep(2)
-    print(f"{Wh}\n IP target       :{Gr}", ip)
-    print(f"{Wh} Type IP         :{Gr}", ip_data["type"])
+    print(f"{Wh}\n Target IP       :{Gr}", ip)
+    print(f"{Wh} IP Type         :{Gr}", ip_data["type"])
     print(f"{Wh} Country         :{Gr}", ip_data["country"])
     print(f"{Wh} Country Code    :{Gr}", ip_data["country_code"])
     print(f"{Wh} City            :{Gr}", ip_data["city"])
@@ -80,13 +79,13 @@ def IP_Track():
 @is_option
 def phoneGW():
     User_phone = input(
-        f"\n {Wh}Enter phone number target {Gr}Ex [+6281xxxxxxxxx] {Wh}: {Gr}")  # INPUT NUMBER PHONE
-    default_region = "ID"  # DEFAULT NEGARA INDONESIA
+        f"\n {Wh}Enter phone number target {Gr}Ex [+6281xxxxxxxxx] {Wh}: {Gr}")  # INPUT PHONE NUMBER
+    default_region = "ID"  # DEFAULT COUNTRY INDONESIA
 
-    parsed_number = phonenumbers.parse(User_phone, default_region)  # VARIABLE PHONENUMBERS
+    parsed_number = phonenumbers.parse(User_phone, default_region)  # PHONENUMBERS VARIABLE
     region_code = phonenumbers.region_code_for_number(parsed_number)
     jenis_provider = carrier.name_for_number(parsed_number, "en")
-    location = geocoder.description_for_number(parsed_number, "id")
+    location = geocoder.description_for_number(parsed_number, "en")
     is_valid_number = phonenumbers.is_valid_number(parsed_number)
     is_possible_number = phonenumbers.is_possible_number(parsed_number)
     formatted_number = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
@@ -96,11 +95,11 @@ def phoneGW():
     timezone1 = timezone.time_zones_for_number(parsed_number)
     timezoneF = ', '.join(timezone1)
 
-    print(f"\n {Wh}========== {Gr}SHOW INFORMATION PHONE NUMBERS {Wh}==========")
+    print(f"\n {Wh}========== {Gr}SHOW PHONE NUMBER INFORMATION {Wh}==========")
     print(f"\n {Wh}Location             :{Gr} {location}")
     print(f" {Wh}Region Code          :{Gr} {region_code}")
     print(f" {Wh}Timezone             :{Gr} {timezoneF}")
-    print(f" {Wh}Operator             :{Gr} {jenis_provider}")
+    print(f" {Wh}Carrier              :{Gr} {jenis_provider}")
     print(f" {Wh}Valid number         :{Gr} {is_valid_number}")
     print(f" {Wh}Possible number      :{Gr} {is_possible_number}")
     print(f" {Wh}International format :{Gr} {formatted_number}")
@@ -160,7 +159,7 @@ def TrackLu():
         print(f"{Re}Error : {e}")
         return
 
-    print(f"\n {Wh}========== {Gr}SHOW INFORMATION USERNAME {Wh}==========")
+    print(f"\n {Wh}========== {Gr}SHOW USERNAME INFORMATION {Wh}==========")
     print()
     for site, url in results.items():
         print(f" {Wh}[ {Gr}+ {Wh}] {site} : {Gr}{url}")
@@ -171,8 +170,8 @@ def showIP():
     respone = requests.get('https://api.ipify.org/')
     Show_IP = respone.text
 
-    print(f"\n {Wh}========== {Gr}SHOW INFORMATION YOUR IP {Wh}==========")
-    print(f"\n {Wh}[{Gr} + {Wh}] Your IP Adrress : {Gr}{Show_IP}")
+    print(f"\n {Wh}========== {Gr}SHOW YOUR IP INFORMATION {Wh}==========")
+    print(f"\n {Wh}[{Gr} + {Wh}] Your IP Address : {Gr}{Show_IP}")
     print(f"\n {Wh}==============================================")
 
 
@@ -260,13 +259,14 @@ def option():
     # BANNER TOOLS
     clear()
     stderr.writelines(f"""
-       ________               __      ______                __  
-      / ____/ /_  ____  _____/ /_    /_  __/________ ______/ /__
-     / / __/ __ \/ __ \/ ___/ __/_____/ / / ___/ __ `/ ___/ //_/
-    / /_/ / / / / /_/ (__  ) /_/_____/ / / /  / /_/ / /__/ ,<   
-    \____/_/ /_/\____/____/\__/     /_/ /_/   \__,_/\___/_/|_| 
+    ███████╗███████╗███╗   ██╗██████╗ ██╗  ██╗    ██████╗  ██████╗ ██████╗ 
+    ╚══███╔╝██╔════╝████╗  ██║██╔══██╗╚██╗██╔╝    ██╔════╝ ██╔═══██╗██╔══██╗
+      ███╔╝ █████╗  ██╔██╗ ██║██║  ██║ ╚███╔╝     ██║  ███╗██║   ██║██║  ██║
+     ███╔╝  ██╔══╝  ██║╚██╗██║██║  ██║ ██╔██╗     ██║   ██║██║   ██║██║  ██║
+    ███████╗███████╗██║ ╚████║██████╔╝██╔╝ ██╗    ╚██████╔╝╚██████╔╝██████╔╝
+    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝     ╚═════╝  ╚═════╝ ╚═════╝ 
 
-              {Wh}[ + ]  C O D E   B Y  H U N X  [ + ]
+              {Wh}[ + ]  C O D E   B Y  Z E N O X   G O D  [ + ]
     """)
 
     stderr.writelines(f"\n\n\n{option_text()}")
@@ -276,19 +276,21 @@ def run_banner():
     clear()
     time.sleep(1)
     stderr.writelines(f"""{Wh}
-         .-.
-       .'   `.          {Wh}--------------------------------
-       :g g   :         {Wh}| {Gr}GHOST - TRACKER - IP ADDRESS {Wh}|
-       : o    `.        {Wh}|       {Gr}@CODE BY HUNXBYTS      {Wh}|
-      :         ``.     {Wh}--------------------------------
-     :             `.
-    :  :         .   `.
-    :   :          ` . `.
-     `.. :            `. ``;
-        `:;             `:'
-           :              `.
-            `.              `.     .
-              `'`'`'`---..,___`;.-'
+            /\\             {Wh}--------------------------------
+           /  \\            {Wh}| {Gr}WITCH - TRACKER - IP ADDRESS {Wh}|
+          / /\\ \\           {Wh}|        {Gr}@CODE BY ZENOX GOD    {Wh}|
+         / /  \\ \\          {Wh}--------------------------------
+        / /____\\ \\
+       /__________\\
+         (  o.o  )
+          )  -  (
+        /   _|_   \\
+       / /|  |  |\\ \\
+      / / |  |  | \\ \\
+     ( (  |  |  |  ) )
+      \\_\\ |__|__| /_/
+    =======//=====================> (Broomstick)
+          //
         """)
     time.sleep(0.5)
 
