@@ -21,14 +21,11 @@ pkg install python3
 ### Usage Tool
 ```
 git clone https://github.com/Godzenox00/Phone-Tracker.git
-cd GhostTrack
+cd Phone-Tracker
 pip3 install -r requirements.txt
 python3 ZenTrack.py
 ```
 
-Display on the menu ```IP Tracker```
-
-<img src="https://github.com/Godzenox00 " />
 
 on the IP Track menu, you can combo with the seeker tool to get the target IP
 <details>
@@ -36,15 +33,10 @@ on the IP Track menu, you can combo with the seeker tool to get the target IP
 - <strong><a href="https://github.com/thewhiteh4t/seeker">Get Seeker</a></strong>
 </details>
 
-Display on the menu ```Phone Tracker```
-
-<img src="https://github.com/Godzenox00/Phone-Tracker/blob/main/asset/phone.png" />
 
 on this menu you can search for information from the target phone number
 
-Display on the menu ```Username Tracker```
 
-<img src="https://github.com/Godzenox00/Phone-Tracker/blob/main/asset/User.png"/>
 on this menu you can search for information from the target username on social media
 
 <details>
